@@ -1,0 +1,92 @@
+---
+title: "hw2-exploring-patterns-of-envi-injust"
+format: html
+---
+
+```{r}
+# Load needed libraries 
+library(tidyverse)
+library(sf) # For handling vector data
+library(tmap) # For making maps
+library(spData) # Pre-loaded spatial data
+```
+
+Read in data
+```{r}
+# Read in environmental justice data
+ejscreen <- st_read(here::here("data", "ejscreen", "EJSCREEN_2023_BG_StatePct_with_AS_CNMI_GU_VI.gdb"))
+
+# Read in redlining data
+redlining <- st_read(here::here("data", "mapping-inequality", "mapping-inequality-los-angeles.json"))
+
+# Read in biodiversity data
+bio_div <- st_read(here::here("data", "gbif-birds-LA", "gbif-birds-LA.shp"))
+```
+Select for Los Angeles County data: 
+```{r}
+ la_ejscreen <- ejscreen |> 
+  filter(CNTY_NAME == "Los Angeles County")
+```
+
+Looking at the CRS for all of the datasets: 
+```{r}
+# EJ screen CRS
+st_crs(la_ejscreen)
+```
+
+
+```{r}
+# Redlining CRS
+st_crs(redlining)
+```
+
+
+```{r}
+# Biodiversity CRS
+st_crs(bio_div)
+```
+```{r}
+
+```
+ Check to see if the projection is geographic or projected.
+```{r}
+st_crs(la_ejscreen)$IsGeographic
+st_crs(redlining)$IsGeographic
+st_crs(bio_div)$IsGeographic
+```
+ 
+Since the environmental justice data is projected, and projected coordinate reference systems are better for 2D map making this is the CRS we will keep. Change the CRS of redlining data and biodiversity data to match the CRS of the environmental justice screen data.  
+```{r}
+# Use st_transform() to set the CRS to that of the environmental justice data
+redlining <- st_transform(redlining, crs = st_crs(la_ejscreen))
+bio_div <- st_transform(bio_div, crs = st_crs(la_ejscreen))
+```
+
+Making sure the CRS are the same for all of the datasets
+```{r}
+# Setting the CRS to equal each other in a boolean to make sure they are all the same
+# Check relining data is using the same CRS as la_ejscreen data
+if (st_crs(la_ejscreen)==st_crs(redlining)){
+  print("it's a match!")
+}else {
+    print("still not a match")
+}
+
+# Check bio diversity data is using the same CRS as la_ejscreen data
+if (st_crs(la_ejscreen)==st_crs(bio_div)){
+  print("it's a match!")
+}else {
+    print("still not a match")
+  }
+```
+
+
+# Part 1: Legacy of Redlining in current environmental (in)justice
+1. Create a map if historical relining neighborhoods 
+```{r}
+tm_shape(la_ejscreen) +
+  tm_polygons() + 
+tm_shape(redlining, is.main = TRUE) + # is.main to make this the size of the map
+  tm_polygons()
+```
+
