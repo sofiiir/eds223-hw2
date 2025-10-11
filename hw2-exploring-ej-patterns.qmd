@@ -88,6 +88,17 @@ tm_shape(la_ejscreen) +
   tm_polygons() + 
 tm_shape(redlining, is.main = TRUE) + # is.main to make this the size of the map
   tm_polygons(fill = "grade",
-              fill.scale = tm_scale_discrete(values = c("forestgreen", "blue", "yellow", "red")))
+              fill.scale = tm_scale_discrete(values = c("#9ca260", "#98aeac", "#d7b65d", "#cb6e7e")),
+              fill.legend = tm_legend(title = "Ranked Redlining by the HOLC")) +
+  tm_title(text = "Los Angeles Historic Home Owners' Loan Corporation (HOLC) Redlining",
+           frame = TRUE) + 
+  tm_compass() +
+  tm_scale_bar()
+```
+### 2. Create a table summarizing census block groups that fall within each HOLC grade 
+
+Combine the redlining data and la_ejscreen data
+```{r}
+
 ```
 
