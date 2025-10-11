@@ -1,5 +1,5 @@
 ---
-title: "hw2-exploring-patterns-of-envi-injust"
+title: "HW2: Exploring Patterns of Environmental Justice"
 format: html
 ---
 
@@ -82,7 +82,7 @@ if (st_crs(la_ejscreen)==st_crs(bio_div)){
 
 
 # Part 1: Legacy of Redlining in current environmental (in)justice
-1. Create a map if historical relining neighborhoods 
+### 1. Create a map if historical relining neighborhoods 
 ```{r}
 tm_shape(la_ejscreen) +
   tm_polygons() + 
@@ -99,6 +99,28 @@ tm_shape(redlining, is.main = TRUE) + # is.main to make this the size of the map
 
 Combine the redlining data and la_ejscreen data
 ```{r}
+# Joining relinging and la_ejscreen using the geographic data
+ej_redlining <- st_join(redlining, la_ejscreen)
 
+# Drop the geogrphic data since we are only creating a table
+ej_redlining <- st_drop_geometry(ej_redlining)
+```
+
+```{r}
+# Clean the names of the new dataframe
+ej_redlining <- janitor::clean_names(ej_redlining)
+```
+
+
+```{r}
+# Calculate percentage of census block groups that fall within each HOLC grade
+# ej_redlining |> 
+#   group_by(grade) |> 
+#   summarise(count(id))
+```
+### 3. Create two visualizations summarizing current conditions (from the EJScreen data) within HOLC grades using the mean of percentile low life expectancy and percentile for Particulate Matter 2.5 variables.
+```{r}
+# ggplot(ej_redlining) +
+#   geom_bar(aes(x = grade, y = average calculation of lifeexppct))
 ```
 
