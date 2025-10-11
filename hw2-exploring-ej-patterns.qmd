@@ -87,6 +87,7 @@ if (st_crs(la_ejscreen)==st_crs(bio_div)){
 tm_shape(la_ejscreen) +
   tm_polygons() + 
 tm_shape(redlining, is.main = TRUE) + # is.main to make this the size of the map
-  tm_polygons()
+  tm_polygons(fill = "grade",
+              fill.scale = tm_scale_discrete(values = c("forestgreen", "blue", "yellow", "red")))
 ```
 
