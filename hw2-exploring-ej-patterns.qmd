@@ -45,17 +45,15 @@ st_crs(redlining)
 # Biodiversity CRS
 st_crs(bio_div)
 ```
-```{r}
 
-```
- Check to see if the projection is geographic or projected.
+ Check to see if the projections are geographic or projected.
 ```{r}
 st_crs(la_ejscreen)$IsGeographic
 st_crs(redlining)$IsGeographic
 st_crs(bio_div)$IsGeographic
 ```
  
-Since the environmental justice data is projected, and projected coordinate reference systems are better for 2D map making this is the CRS we will keep. Change the CRS of redlining data and biodiversity data to match the CRS of the environmental justice screen data.  
+Since the environmental justice data is projected, and projected coordinate reference systems are better for 2D map making this is the CRS that will be used for this mapping assignment. Change the CRS of redlining data and biodiversity data to match the CRS of the environmental justice screen data.  
 ```{r}
 # Use st_transform() to set the CRS to that of the environmental justice data
 redlining <- st_transform(redlining, crs = st_crs(la_ejscreen))
@@ -82,14 +80,14 @@ if (st_crs(la_ejscreen)==st_crs(bio_div)){
 
 
 # Part 1: Legacy of Redlining in current environmental (in)justice
-### 1. Create a map if historical relining neighborhoods 
+### 1. Create a map of historical relining neighborhoods 
 ```{r}
 tm_shape(la_ejscreen) +
   tm_polygons() + 
 tm_shape(redlining, is.main = TRUE) + # is.main to make this the size of the map
-  tm_polygons(fill = "grade",
-              fill.scale = tm_scale_discrete(values = c("#9ca260", "#98aeac", "#d7b65d", "#cb6e7e")),
-              fill.legend = tm_legend(title = "Ranked Redlining by the HOLC")) +
+  tm_polygons(fill = "grade", 
+              fill.scale = tm_scale_discrete(values = c("#9ca260", "#98aeac", "#d7b65d", "#cb6e7e")), # Color matched to align with historical maps 
+              fill.legend = tm_legend_bivariate(title = "Ranked Redlining by the HOLC")) +
   tm_title(text = "Los Angeles Historic Home Owners' Loan Corporation (HOLC) Redlining",
            frame = TRUE) + 
   tm_compass() +
@@ -99,7 +97,7 @@ tm_shape(redlining, is.main = TRUE) + # is.main to make this the size of the map
 
 Combine the redlining data and la_ejscreen data
 ```{r}
-# Joining relinging and la_ejscreen using the geographic data
+# Joining redlining and la_ejscreen using the geographic data
 ej_redlining <- st_join(redlining, la_ejscreen)
 
 # Drop the geogrphic data since we are only creating a table
@@ -114,13 +112,103 @@ ej_redlining <- janitor::clean_names(ej_redlining)
 
 ```{r}
 # Calculate percentage of census block groups that fall within each HOLC grade
-# ej_redlining |> 
-#   group_by(grade) |> 
-#   summarise(count(id))
+ej_redlining <- ej_redlining |> 
+  group_by(grade) |> 
+  mutate(grade_freq = n())
+
+# New dataframe that includes only one line per each grade
+perc_grade <- ej_redlining|> 
+  distinct(grade, .keep_all = TRUE)
+
+print(perc_grade)
+
+grade_table <- table(perc_grade$grade, perc_grade$grade_freq)
+prop.table(grade_table, margin = 1)
 ```
 ### 3. Create two visualizations summarizing current conditions (from the EJScreen data) within HOLC grades using the mean of percentile low life expectancy and percentile for Particulate Matter 2.5 variables.
+
+#### Graph average percentile low life expectancy per HOLC grade area
 ```{r}
-# ggplot(ej_redlining) +
-#   geom_bar(aes(x = grade, y = average calculation of lifeexppct))
+# Calculate mean of percent of low life expectancy in HOLC Grade Areas
+ej_redlining <- ej_redlining |> 
+  group_by(grade) |> # Group by grade 
+  mutate(mean_perce_low_lifeexppct = mean(lifeexppct, na.rm = TRUE)) |>  # Calculate mean low life expectancy
+  ungroup()
+
+# Select for only one value for each grade for graphing
+mean_life_expt_df <- ej_redlining |> 
+  distinct(grade, .keep_all = TRUE) # .keep_all set to TRUE maintains the whole row
+
+# Graph mean low life expectancy percentage 
+ggplot(mean_life_expt_df, aes(x = grade, y = mean_perce_low_lifeexppct)) +
+  geom_col(aes(fill = grade)) + # geom_col allows for both an x and y for aesthetics
+  labs(title = "Average Percent of Low Life Expectancy in HOLC Grade Areas",
+       x = "HOLC Grade",
+       y = "Average Percent of Low Life Expectancy") +
+  scale_fill_manual(values = c("#9ca260", "#98aeac", "#d7b65d", "#cb6e7e")) # Match colors to historic maps
 ```
+
+#### Graph average percent particulate matter 2.5 per HOLC grade area
+```{r}
+# Calculate mean of percent of Particulate Matter 2.5 (PM 2.5) in HOLC Grade Areas
+ej_redlining <- ej_redlining |> 
+  group_by(grade) |> # Group by grade 
+  mutate(mean_perce_pm25 = mean(p_pm25, na.rm = TRUE)) |>  # Calculate mean pm2.5
+  ungroup()
+
+# Select for only one value for each grade for graphing
+mean_perce_pm25_df <- ej_redlining |> 
+  distinct(grade, .keep_all = TRUE) # .keep_all set to TRUE maintains the whole row
+
+# Graph mean pm 2.5 exposure percentile by grade
+ggplot(mean_perce_pm25_df, aes(x = grade, y = mean_perce_pm25)) +
+  geom_col(aes(fill = grade)) + # geom_col allows for both an x and y for aesthetics
+  labs(title = "Average Percentile for Particulate Matter 2.5 (PM 2.5) in HOLC Grade Areas",
+       x = "HOLC Grade",
+       y = "Average Percentile for PM 2.5") +
+  scale_fill_manual(values = c("#9ca260", "#98aeac", "#d7b65d", "#cb6e7e")) # Match colors to historic maps
+```
+
+#### Graph Analysis
+
+Both the average percent of low life expectancy and average percentile of Particulate Matter 2.5 per HOLC grade area show that those areas historically less likely to acquire loans from HOLC have present day adverse effects. Percent of low life expectancy clearly increases the worse the grade they were given by the HOLC. In other words, in those areas where HOLC blocked communities from acquiring mortgages, today they are areas associated with mean higher rates of percent low life expectancy and higher rates of average high Particulate Matter 2.5.
+
+# Part 2: Legacy of redlining in biodiversity observations
+### Create a visualization of the percent of observations within redlined neighborhoods within each HOLC grade
+
+Combine the redlining data and bird observation data
+```{r}
+# Joining redlining and  using the geographic data
+bio_redlining <- st_join(redlining, bio_div)
+
+# Drop the geogrphic data since we are only making a graph
+bio_redlining <- st_drop_geometry(bio_redlining)
+```
+
+```{r}
+# Calculate the number of observations in each grade 
+obs_redlining <- bio_redlining |> 
+  group_by(grade) |> 
+  mutate(observation_n = n())
+
+# Check if the how many values as a check
+unique(obs_redlining$observation_n) # 5 values in the output as expected
+
+# Keep only one row for each grade for graphing purposes
+obs_values <- obs_redlining |> 
+  distinct(grade, .keep_all = TRUE)
+
+# Add a percent column since we're mapping percent of observations per HOLC grade
+obs_values <- obs_values |> 
+  mutate(perce_obs = (observation_n/(sum(obs_values$observation_n)))) # The calculation is the grades' observation number divided by the sum of all observation numbers
+
+ggplot(obs_values, aes(x = grade, y = perce_obs)) + 
+  geom_col(aes(fill = grade)) +
+  labs(title = "Percent of Bird Observations per HOLC Grade",
+       x = "HOLC Grade",
+       y = "Percent of Bird Observations") +
+  scale_fill_manual(values = c("#9ca260", "#98aeac", "#d7b65d", "#cb6e7e")) # Match colors to historic maps
+```
+
+### Reason our findings dont match Ellis-Soto et al. 2023
 
