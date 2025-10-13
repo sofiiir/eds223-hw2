@@ -145,7 +145,8 @@ ggplot(mean_life_expt_df, aes(x = grade, y = mean_perce_low_lifeexppct)) +
   labs(title = "Average Percent of Low Life Expectancy in HOLC Grade Areas",
        x = "HOLC Grade",
        y = "Average Percent of Low Life Expectancy") +
-  scale_fill_manual(values = c("#9ca260", "#98aeac", "#d7b65d", "#cb6e7e")) # Match colors to historic maps
+  scale_fill_manual(values = c("#9ca260", "#98aeac", "#d7b65d", "#cb6e7e")) + # Match colors to historic maps
+  theme_minimal()
 ```
 
 #### Graph average percent particulate matter 2.5 per HOLC grade area
@@ -166,7 +167,8 @@ ggplot(mean_perce_pm25_df, aes(x = grade, y = mean_perce_pm25)) +
   labs(title = "Average Percentile for Particulate Matter 2.5 (PM 2.5) in HOLC Grade Areas",
        x = "HOLC Grade",
        y = "Average Percentile for PM 2.5") +
-  scale_fill_manual(values = c("#9ca260", "#98aeac", "#d7b65d", "#cb6e7e")) # Match colors to historic maps
+  scale_fill_manual(values = c("#9ca260", "#98aeac", "#d7b65d", "#cb6e7e")) + # Match colors to historic maps
+  theme_minimal()
 ```
 
 #### Graph Analysis
@@ -207,7 +209,8 @@ ggplot(obs_values, aes(x = grade, y = perce_obs)) +
   labs(title = "Percent of Bird Observations per HOLC Grade",
        x = "HOLC Grade",
        y = "Percent of Bird Observations") +
-  scale_fill_manual(values = c("#9ca260", "#98aeac", "#d7b65d", "#cb6e7e")) # Match colors to historic maps
+  scale_fill_manual(values = c("#9ca260", "#98aeac", "#d7b65d", "#cb6e7e")) + # Match colors to historic maps
+  theme_minimal()
 ```
 
 ### Reason our findings dont match Ellis-Soto et al. 2023
