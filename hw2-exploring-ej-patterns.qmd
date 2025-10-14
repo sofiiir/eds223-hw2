@@ -85,20 +85,21 @@ if (st_crs(la_ejscreen)==st_crs(bio_div)){
 tm_shape(la_ejscreen) +
   tm_polygons() + 
 tm_shape(redlining, is.main = TRUE) + # is.main to make this the size of the map
-  tm_polygons(fill = "grade", 
+  tm_polygons(fill = "grade",
               fill.scale = tm_scale_discrete(values = c("#9ca260", "#98aeac", "#d7b65d", "#cb6e7e")), # Color matched to align with historical maps 
-              fill.legend = tm_legend_bivariate(title = "Ranked Redlining by the HOLC")) +
+              fill.legend = tm_legend(title = "Ranked Redlining by the HOLC",
+                                      labels = c("A", "B", "C", "D", "NA"))) + # Add the label 
   tm_title(text = "Los Angeles Historic Home Owners' Loan Corporation (HOLC) Redlining",
            frame = TRUE) + 
   tm_compass() +
-  tm_scale_bar()
+  tm_scalebar()
 ```
 ### 2. Create a table summarizing census block groups that fall within each HOLC grade 
 
 Combine the redlining data and la_ejscreen data
 ```{r}
 # Joining redlining and la_ejscreen using the geographic data
-ej_redlining <- st_join(redlining, la_ejscreen)
+ej_redlining <- st_join(la_ejscreen, redlining, by = st_within)
 
 # Drop the geogrphic data since we are only creating a table
 ej_redlining <- st_drop_geometry(ej_redlining)
@@ -112,15 +113,10 @@ ej_redlining <- janitor::clean_names(ej_redlining)
 
 ```{r}
 # Calculate percentage of census block groups that fall within each HOLC grade
-ej_redlining <- ej_redlining |> 
+perc_cen_block <- ej_redlining |> 
   group_by(grade) |> 
-  mutate(grade_freq = n())
+  summarise(grade_freq = (n())/sum(n()))
 
-# New dataframe that includes only one line per each grade
-perc_grade <- ej_redlining|> 
-  distinct(grade, .keep_all = TRUE)
-
-print(perc_grade)
 
 grade_table <- table(perc_grade$grade, perc_grade$grade_freq)
 prop.table(grade_table, margin = 1)
@@ -129,18 +125,11 @@ prop.table(grade_table, margin = 1)
 
 #### Graph average percentile low life expectancy per HOLC grade area
 ```{r}
-# Calculate mean of percent of low life expectancy in HOLC Grade Areas
-ej_redlining <- ej_redlining |> 
-  group_by(grade) |> # Group by grade 
-  mutate(mean_perce_low_lifeexppct = mean(lifeexppct, na.rm = TRUE)) |>  # Calculate mean low life expectancy
-  ungroup()
-
-# Select for only one value for each grade for graphing
-mean_life_expt_df <- ej_redlining |> 
-  distinct(grade, .keep_all = TRUE) # .keep_all set to TRUE maintains the whole row
-
-# Graph mean low life expectancy percentage 
-ggplot(mean_life_expt_df, aes(x = grade, y = mean_perce_low_lifeexppct)) +
+ej_redlining |> 
+  group_by(grade) |> 
+  summarise(mean_perce_low_lifeexppct = mean(lifeexppct, na.rm = TRUE)) |> 
+  ungroup() |> 
+  ggplot(aes(x = grade, y = mean_perce_low_lifeexppct)) +
   geom_col(aes(fill = grade)) + # geom_col allows for both an x and y for aesthetics
   labs(title = "Average Percent of Low Life Expectancy in HOLC Grade Areas",
        x = "HOLC Grade",
@@ -149,7 +138,9 @@ ggplot(mean_life_expt_df, aes(x = grade, y = mean_perce_low_lifeexppct)) +
   theme_minimal()
 ```
 
+
 #### Graph average percent particulate matter 2.5 per HOLC grade area
+CHANGE TO GROUP_BY() PIPE SUMMARIZE()
 ```{r}
 # Calculate mean of percent of Particulate Matter 2.5 (PM 2.5) in HOLC Grade Areas
 ej_redlining <- ej_redlining |> 
@@ -181,7 +172,7 @@ Both the average percent of low life expectancy and average percentile of Partic
 Combine the redlining data and bird observation data
 ```{r}
 # Joining redlining and  using the geographic data
-bio_redlining <- st_join(redlining, bio_div)
+bio_redlining <- st_join(bio_div, redlining, by = st_within())
 
 # Drop the geogrphic data since we are only making a graph
 bio_redlining <- st_drop_geometry(bio_redlining)
