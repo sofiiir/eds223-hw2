@@ -9,6 +9,7 @@ library(tidyverse)
 library(sf) # For handling vector data
 library(tmap) # For making maps
 library(spData) # Pre-loaded spatial data
+library(kableExtra)
 ```
 
 Read in data
@@ -115,11 +116,13 @@ ej_redlining <- janitor::clean_names(ej_redlining)
 # Calculate percentage of census block groups that fall within each HOLC grade
 perc_cen_block <- ej_redlining |> 
   group_by(grade) |> 
-  summarise(grade_freq = (n())/sum(n()))
+  summarise(grade_cnt = n()) |> 
+  mutate(grade_freq = (grade_cnt/sum(grade_cnt)))
 
-
-grade_table <- table(perc_grade$grade, perc_grade$grade_freq)
-prop.table(grade_table, margin = 1)
+kable(perc_cen_block, 
+      col.names = c("Grade", "Count", "Frequency"),
+      format = "simple",
+      padding = 3)
 ```
 ### 3. Create two visualizations summarizing current conditions (from the EJScreen data) within HOLC grades using the mean of percentile low life expectancy and percentile for Particulate Matter 2.5 variables.
 
@@ -140,20 +143,13 @@ ej_redlining |>
 
 
 #### Graph average percent particulate matter 2.5 per HOLC grade area
-CHANGE TO GROUP_BY() PIPE SUMMARIZE()
 ```{r}
 # Calculate mean of percent of Particulate Matter 2.5 (PM 2.5) in HOLC Grade Areas
-ej_redlining <- ej_redlining |> 
+ej_redlining |> 
   group_by(grade) |> # Group by grade 
-  mutate(mean_perce_pm25 = mean(p_pm25, na.rm = TRUE)) |>  # Calculate mean pm2.5
-  ungroup()
-
-# Select for only one value for each grade for graphing
-mean_perce_pm25_df <- ej_redlining |> 
-  distinct(grade, .keep_all = TRUE) # .keep_all set to TRUE maintains the whole row
-
-# Graph mean pm 2.5 exposure percentile by grade
-ggplot(mean_perce_pm25_df, aes(x = grade, y = mean_perce_pm25)) +
+ summarise(mean_perce_pm25 = mean(p_pm25, na.rm = TRUE)) |>  # Calculate mean pm2.5
+  ungroup() |> 
+ggplot(aes(x = grade, y = mean_perce_pm25)) +
   geom_col(aes(fill = grade)) + # geom_col allows for both an x and y for aesthetics
   labs(title = "Average Percentile for Particulate Matter 2.5 (PM 2.5) in HOLC Grade Areas",
        x = "HOLC Grade",
