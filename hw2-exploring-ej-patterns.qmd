@@ -121,7 +121,7 @@ perc_cen_block <- ej_redlining |>
 
 kable(perc_cen_block, 
       col.names = c("Grade", "Count", "Frequency"),
-      format = "simple",
+      format = "simple",st
       padding = 3)
 ```
 ### 3. Create two visualizations summarizing current conditions (from the EJScreen data) within HOLC grades using the mean of percentile low life expectancy and percentile for Particulate Matter 2.5 variables.
