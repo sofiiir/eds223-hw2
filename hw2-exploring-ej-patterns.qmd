@@ -4,6 +4,9 @@ format: html
 message: false
 warning: false
 ---
+# Introduction
+As a racially diverse area of the United States, Los Angeles acts as a case study for the far reaching environmental injustices that occur worldwide. The Home Owner's Loan Corporation (HOLC) gave neighborhoods grades from A to D defining what portions of the city they perceived as worthy of real estate investments. The consequence is that even today effects from this 
+
 
 ```{r}
 # Load needed libraries 
@@ -16,6 +19,7 @@ library(kableExtra)
 
 #### Read in data
 ```{r}
+#| output: false
 # Read in environmental justice data
 ejscreen <- st_read(here::here("data", "ejscreen", "EJSCREEN_2023_BG_StatePct_with_AS_CNMI_GU_VI.gdb"))
 
@@ -25,12 +29,13 @@ redlining <- st_read(here::here("data", "mapping-inequality", "mapping-inequalit
 # Read in biodiversity data
 bio_div <- st_read(here::here("data", "gbif-birds-LA", "gbif-birds-LA.shp"))
 ```
-Select for Los Angeles County data. This reduces the amount of processing time for future joins and mapping.
+Select for Los Angeles County data. This reduces the amount of processing time for future joins and mapping. 
 ```{r}
+# There is no city column so selecting for county 
  la_ejscreen <- ejscreen |> 
   filter(CNTY_NAME == "Los Angeles County")
 ```
-
+### CRS inspection
 Looking at the CRS for all of the datasets: 
 ```{r}
 # EJ screen CRS
@@ -48,15 +53,18 @@ st_crs(redlining)
 # Biodiversity CRS
 st_crs(bio_div)
 ```
+The CRS differ between the datasets, so further analysis is needed to decide what is a better crs for this project. 
 
- Check to see if the projections are geographic or projected.
+### Check to see if the projections are geographic or projected.
 ```{r}
 st_crs(la_ejscreen)$IsGeographic
 st_crs(redlining)$IsGeographic
 st_crs(bio_div)$IsGeographic
 ```
  
-Since the environmental justice data is projected, and projected coordinate reference systems are better for 2D map making this is the CRS that will be used for this mapping assignment. Change the CRS of redlining data and biodiversity data to match the CRS of the environmental justice screen data.  
+Since the environmental justice data is projected, and projected coordinate reference systems are better for 2D map making this is the CRS that will be used for this mapping assignment. 
+
+#### Change the CRS of redlining data and biodiversity data to match the CRS of the environmental justice screen data.  
 ```{r}
 # Use st_transform() to set the CRS to that of the environmental justice data
 redlining <- st_transform(redlining, crs = st_crs(la_ejscreen))
@@ -84,8 +92,9 @@ if (st_crs(la_ejscreen)==st_crs(bio_div)){
 
 # Part 1: Legacy of Redlining in current environmental (in)justice
 ### 1. Create a map of historical relining neighborhoods 
+When considering how to construct of map of Los Angeles' redlined neighborhoods, the growth of Los Angeles in the last century indicates that not all of present day Los Angeles would have a H
 ```{r}
-tm_shape(la_ejscreen) +
+tm_shape(la_ejscreen) + # Set a baselayer to show the entirety of Los Angeles
   tm_polygons() + 
 tm_shape(redlining, is.main = TRUE) + # is.main to make this the size of the map
   tm_polygons(fill = "grade",
@@ -95,14 +104,14 @@ tm_shape(redlining, is.main = TRUE) + # is.main to make this the size of the map
   tm_title(text = "Los Angeles Historic Home Owners' Loan Corporation (HOLC) Redlining",
            frame = TRUE) + 
   tm_compass() +
-  tm_scalebar()
+  tm_scalebar() 
 ```
 ### 2. Create a table summarizing census block groups that fall within each HOLC grade 
 
 Combine the redlining data and la_ejscreen data
 ```{r}
 # Joining redlining and la_ejscreen using the geographic data
-ej_redlining <- st_join(la_ejscreen, redlining, join = st_within)
+ej_redlining <- st_join(la_ejscreen, redlining, join = st_intersects)
 
 # Drop the geogrphic data since we are only creating a table
 ej_redlining <- st_drop_geometry(ej_redlining)
@@ -131,6 +140,7 @@ kable(perc_cen_block,
 #### Graph average percentile low life expectancy per HOLC grade area
 ```{r}
 ej_redlining |> 
+  drop_na() |> 
   group_by(grade) |> 
   summarise(mean_perce_low_lifeexppct = mean(lifeexppct, na.rm = TRUE)) |> 
   ungroup() |> 
@@ -148,6 +158,7 @@ ej_redlining |>
 ```{r}
 # Calculate mean of percent of Particulate Matter 2.5 (PM 2.5) in HOLC Grade Areas
 ej_redlining |> 
+  drop_na() |>
   group_by(grade) |> # Group by grade 
  summarise(mean_perce_pm25 = mean(p_pm25, na.rm = TRUE)) |>  # Calculate mean pm2.5
   ungroup() |> 
@@ -170,7 +181,7 @@ Both the average percent of low life expectancy and average percentile of Partic
 Combine the redlining data and bird observation data
 ```{r}
 # Joining redlining and  using the geographic data
-bio_redlining <- st_join(bio_div, redlining, join = st_intersects)
+bio_redlining <- st_join(bio_div, redlining, join = st_within)
 
 # Drop the geogrphic data since we are only making a graph
 bio_redlining <- st_drop_geometry(bio_redlining)
@@ -179,11 +190,11 @@ bio_redlining <- st_drop_geometry(bio_redlining)
 ```{r}
 # Calculate the number of observations in each grade 
 bio_redlining |> 
+  drop_na() |>
   group_by(grade) |> 
   summarise(observation_cnt = n()) |>
   ungroup() |> 
   mutate(observation_freq = observation_cnt/sum(observation_cnt, na.rm = TRUE)) |>
-  drop_na() |> 
   ggplot(aes(x = grade, y = observation_freq)) + 
   geom_col(aes(fill = grade)) +
   labs(title = "Percent of Bird Observations per HOLC Grade",
