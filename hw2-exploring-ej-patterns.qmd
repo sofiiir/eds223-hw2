@@ -1,6 +1,8 @@
 ---
 title: "HW2: Exploring Patterns of Environmental Justice"
 format: html
+message: false
+warning: false
 ---
 
 ```{r}
@@ -12,7 +14,7 @@ library(spData) # Pre-loaded spatial data
 library(kableExtra)
 ```
 
-Read in data
+#### Read in data
 ```{r}
 # Read in environmental justice data
 ejscreen <- st_read(here::here("data", "ejscreen", "EJSCREEN_2023_BG_StatePct_with_AS_CNMI_GU_VI.gdb"))
@@ -23,7 +25,7 @@ redlining <- st_read(here::here("data", "mapping-inequality", "mapping-inequalit
 # Read in biodiversity data
 bio_div <- st_read(here::here("data", "gbif-birds-LA", "gbif-birds-LA.shp"))
 ```
-Select for Los Angeles County data: 
+Select for Los Angeles County data. This reduces the amount of processing time for future joins and mapping.
 ```{r}
  la_ejscreen <- ejscreen |> 
   filter(CNTY_NAME == "Los Angeles County")
@@ -61,7 +63,7 @@ redlining <- st_transform(redlining, crs = st_crs(la_ejscreen))
 bio_div <- st_transform(bio_div, crs = st_crs(la_ejscreen))
 ```
 
-Making sure the CRS are the same for all of the datasets
+#### Making sure the CRS are the same for all of the datasets
 ```{r}
 # Setting the CRS to equal each other in a boolean to make sure they are all the same
 # Check relining data is using the same CRS as la_ejscreen data
@@ -100,7 +102,7 @@ tm_shape(redlining, is.main = TRUE) + # is.main to make this the size of the map
 Combine the redlining data and la_ejscreen data
 ```{r}
 # Joining redlining and la_ejscreen using the geographic data
-ej_redlining <- st_join(la_ejscreen, redlining, by = st_within)
+ej_redlining <- st_join(la_ejscreen, redlining, join = st_within)
 
 # Drop the geogrphic data since we are only creating a table
 ej_redlining <- st_drop_geometry(ej_redlining)
@@ -121,7 +123,7 @@ perc_cen_block <- ej_redlining |>
 
 kable(perc_cen_block, 
       col.names = c("Grade", "Count", "Frequency"),
-      format = "simple",st
+      format = "simple",
       padding = 3)
 ```
 ### 3. Create two visualizations summarizing current conditions (from the EJScreen data) within HOLC grades using the mean of percentile low life expectancy and percentile for Particulate Matter 2.5 variables.
@@ -168,7 +170,7 @@ Both the average percent of low life expectancy and average percentile of Partic
 Combine the redlining data and bird observation data
 ```{r}
 # Joining redlining and  using the geographic data
-bio_redlining <- st_join(bio_div, redlining, by = st_within())
+bio_redlining <- st_join(bio_div, redlining, join = st_intersects)
 
 # Drop the geogrphic data since we are only making a graph
 bio_redlining <- st_drop_geometry(bio_redlining)
@@ -176,22 +178,13 @@ bio_redlining <- st_drop_geometry(bio_redlining)
 
 ```{r}
 # Calculate the number of observations in each grade 
-obs_redlining <- bio_redlining |> 
+bio_redlining |> 
   group_by(grade) |> 
-  mutate(observation_n = n())
-
-# Check if the how many values as a check
-unique(obs_redlining$observation_n) # 5 values in the output as expected
-
-# Keep only one row for each grade for graphing purposes
-obs_values <- obs_redlining |> 
-  distinct(grade, .keep_all = TRUE)
-
-# Add a percent column since we're mapping percent of observations per HOLC grade
-obs_values <- obs_values |> 
-  mutate(perce_obs = (observation_n/(sum(obs_values$observation_n)))) # The calculation is the grades' observation number divided by the sum of all observation numbers
-
-ggplot(obs_values, aes(x = grade, y = perce_obs)) + 
+  summarise(observation_cnt = n()) |>
+  ungroup() |> 
+  mutate(observation_freq = observation_cnt/sum(observation_cnt, na.rm = TRUE)) |>
+  drop_na() |> 
+  ggplot(aes(x = grade, y = observation_freq)) + 
   geom_col(aes(fill = grade)) +
   labs(title = "Percent of Bird Observations per HOLC Grade",
        x = "HOLC Grade",
@@ -201,4 +194,4 @@ ggplot(obs_values, aes(x = grade, y = perce_obs)) +
 ```
 
 ### Reason our findings dont match Ellis-Soto et al. 2023
-
+Ellis-Soto et al. (2023) uses log to normalize the data. Los Angeles has grown since the HOLC maps were utilized much of present day Los Angeles did not exist. 
