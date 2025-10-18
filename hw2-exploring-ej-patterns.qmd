@@ -5,8 +5,8 @@ message: false
 warning: false
 ---
 # Introduction
-As a racially diverse area of the United States, Los Angeles acts as a case study for the far reaching environmental injustices that occur worldwide. The Home Owner's Loan Corporation (HOLC) gave neighborhoods grades from A to D defining what portions of the city they perceived as worthy of real estate investments. The consequence is that even today effects from this 
-
+As a racially diverse area of the United States, Los Angeles acts as a case study for the far reaching environmental injustices that occur nationwide. In the 1930's the Home Owner's Loan Corporation (HOLC) gave neighborhoods grades from A to D defining what portions of the city they perceived as worthy of real estate investments. The consequence is that even today effects from this racially motivated grading system manifest in the form of unequal risk to being exposed to environmental hazards. This project explores contemporary 
+symptoms of what has come to be known as redlining. 
 
 ```{r}
 # Load needed libraries 
@@ -38,22 +38,25 @@ Select for Los Angeles County data. This reduces the amount of processing time f
 ### CRS inspection
 Looking at the CRS for all of the datasets: 
 ```{r}
+#| output: false
 # EJ screen CRS
 st_crs(la_ejscreen)
 ```
 
 
 ```{r}
+#| output: false
 # Redlining CRS
 st_crs(redlining)
 ```
 
 
 ```{r}
+#| output: false
 # Biodiversity CRS
 st_crs(bio_div)
 ```
-The CRS differ between the datasets, so further analysis is needed to decide what is a better crs for this project. 
+The CRS differ between the datasets, so further analysis is needed to decide what is the best coordinate reference system for this project. 
 
 ### Check to see if the projections are geographic or projected.
 ```{r}
@@ -62,11 +65,11 @@ st_crs(redlining)$IsGeographic
 st_crs(bio_div)$IsGeographic
 ```
  
-Since the environmental justice data is projected, and projected coordinate reference systems are better for 2D map making this is the CRS that will be used for this mapping assignment. 
+Since the environmental justice data is projected, and projected coordinate reference systems are better for 2D map making, this is the CRS that will be used for this mapping assignment. 
 
 #### Change the CRS of redlining data and biodiversity data to match the CRS of the environmental justice screen data.  
 ```{r}
-# Use st_transform() to set the CRS to that of the environmental justice data
+# Set the CRS to that of the environmental justice data
 redlining <- st_transform(redlining, crs = st_crs(la_ejscreen))
 bio_div <- st_transform(bio_div, crs = st_crs(la_ejscreen))
 ```
@@ -89,10 +92,9 @@ if (st_crs(la_ejscreen)==st_crs(bio_div)){
   }
 ```
 
-
 # Part 1: Legacy of Redlining in current environmental (in)justice
 ### 1. Create a map of historical relining neighborhoods 
-When considering how to construct of map of Los Angeles' redlined neighborhoods, the growth of Los Angeles in the last century indicates that not all of present day Los Angeles would have a H
+When considering how to construct a map of Los Angeles' redlined neighborhoods, the growth of Los Angeles in the last century indicates that not all of present day Los Angeles would have a HOLC grade. Therefore, a baselayer is added to make the map complete. 
 ```{r}
 tm_shape(la_ejscreen) + # Set a baselayer to show the entirety of Los Angeles
   tm_polygons() + 
@@ -128,10 +130,10 @@ ej_redlining <- janitor::clean_names(ej_redlining)
 perc_cen_block <- ej_redlining |> 
   group_by(grade) |> 
   summarise(grade_cnt = n()) |> 
-  mutate(grade_freq = (grade_cnt/sum(grade_cnt)))
+  mutate(grade_freq = round((grade_cnt/sum(grade_cnt)* 100), 3))
 
 kable(perc_cen_block, 
-      col.names = c("Grade", "Count", "Frequency"),
+      col.names = c("Grade", "Count", "Percent"),
       format = "simple",
       padding = 3)
 ```
@@ -206,3 +208,6 @@ bio_redlining |>
 
 ### Reason our findings dont match Ellis-Soto et al. 2023
 Ellis-Soto et al. (2023) uses log to normalize the data. Los Angeles has grown since the HOLC maps were utilized much of present day Los Angeles did not exist. 
+
+# Reference
+
