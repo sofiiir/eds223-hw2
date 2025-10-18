@@ -1,12 +1,15 @@
 ---
 title: "HW2: Exploring Patterns of Environmental Justice"
+author: "Sofia Rodas"
+date: October 13, 2025
 format: html
 message: false
 warning: false
 ---
 # Introduction
-As a racially diverse area of the United States, Los Angeles acts as a case study for the far reaching environmental injustices that occur nationwide. In the 1930's the Home Owner's Loan Corporation (HOLC) gave neighborhoods grades from A to D defining what portions of the city they perceived as worthy of real estate investments. The consequence is that even today effects from this racially motivated grading system manifest in the form of unequal risk to being exposed to environmental hazards. This project explores contemporary 
-symptoms of what has come to be known as redlining. 
+As a racially diverse area of the United States, Los Angeles acts as a case study for the far reaching environmental injustices that occur nationwide. In the 1930's the Home Owner's Loan Corporation (HOLC) gave neighborhoods grades from A to D defining what portions of the city they perceived as worthy of real estate investments. The consequence is that even today effects from this racially motivated grading system manifest in the form of unequal risk to being exposed to environmental hazards. This project explores contemporary symptoms of what has come to be known as redlining. 
+
+**Note on data limitations:** The Environmental Justice data does not have a column for cities, therefore the Environmental Justice data contains data from all of Los Angeles County even after filtering. Los Angeles County contains 88 cities according to the official Los Angeles County government webpage. Explanations are provided in the workflow as to how this data limitation is addressed throughout.
 
 ```{r}
 # Load needed libraries 
@@ -15,6 +18,7 @@ library(sf) # For handling vector data
 library(tmap) # For making maps
 library(spData) # Pre-loaded spatial data
 library(kableExtra)
+library(patchwork)
 ```
 
 #### Read in data
@@ -58,6 +62,8 @@ st_crs(bio_div)
 ```
 The CRS differ between the datasets, so further analysis is needed to decide what is the best coordinate reference system for this project. 
 
+Note: The CRS outputs are hidden for a cleaner document. 
+
 ### Check to see if the projections are geographic or projected.
 ```{r}
 st_crs(la_ejscreen)$IsGeographic
@@ -65,9 +71,9 @@ st_crs(redlining)$IsGeographic
 st_crs(bio_div)$IsGeographic
 ```
  
-Since the environmental justice data is projected, and projected coordinate reference systems are better for 2D map making, this is the CRS that will be used for this mapping assignment. 
+Since the Environmental Justice data is projected, and projected coordinate reference systems are better for 2D map making, the crs from the Environmental Justice data, WGS: Pseudo-Mercator, will be used for this mapping assignment. 
 
-#### Change the CRS of redlining data and biodiversity data to match the CRS of the environmental justice screen data.  
+#### Change the CRS of redlining data and biodiversity data to match the CRS of the Environmental Justice data.  
 ```{r}
 # Set the CRS to that of the environmental justice data
 redlining <- st_transform(redlining, crs = st_crs(la_ejscreen))
@@ -76,7 +82,7 @@ bio_div <- st_transform(bio_div, crs = st_crs(la_ejscreen))
 
 #### Making sure the CRS are the same for all of the datasets
 ```{r}
-# Setting the CRS to equal each other in a boolean to make sure they are all the same
+# Set the CRS to equal each other in a boolean to make sure they are all the same
 # Check relining data is using the same CRS as la_ejscreen data
 if (st_crs(la_ejscreen)==st_crs(redlining)){
   print("it's a match!")
@@ -94,101 +100,151 @@ if (st_crs(la_ejscreen)==st_crs(bio_div)){
 
 # Part 1: Legacy of Redlining in current environmental (in)justice
 ### 1. Create a map of historical relining neighborhoods 
-When considering how to construct a map of Los Angeles' redlined neighborhoods, the growth of Los Angeles in the last century indicates that not all of present day Los Angeles would have a HOLC grade. Therefore, a baselayer is added to make the map complete. 
+
+When considering how to construct a map of Los Angeles' redlined neighborhoods, the growth of Los Angeles in the last century indicates that not all of present day Los Angeles would have a HOLC grade. Therefore, a base-layer is added to make the map useful in analyzing what sections of Los Angeles have differing HOLC grades. 
+
 ```{r}
-tm_shape(la_ejscreen) + # Set a baselayer to show the entirety of Los Angeles
-  tm_polygons() + 
-tm_shape(redlining, is.main = TRUE) + # is.main to make this the size of the map
-  tm_polygons(fill = "grade",
-              fill.scale = tm_scale_discrete(values = c("#9ca260", "#98aeac", "#d7b65d", "#cb6e7e")), # Color matched to align with historical maps 
-              fill.legend = tm_legend(title = "Ranked Redlining by the HOLC",
-                                      labels = c("A", "B", "C", "D", "NA"))) + # Add the label 
+tm_shape(redlining) +
+  tm_basemap() +
+  tm_polygons() +
+  tm_fill(fill = "grade",
+          fill.scale = tm_scale_discrete(values = c("#9ca260", 
+                                                    "#98aeac",
+                                                    "#d7b65d",
+                                                    "#cb6e7e")), # Use historic colors
+          fill.legend = tm_legend(title = "HOLC Ranked Redlining",
+                                  labels = c("A", 
+                                             "B", 
+                                             "C", 
+                                             "D", 
+                                             "NA"))) +
+  tm_borders() + # Add borders on top of fill
   tm_title(text = "Los Angeles Historic Home Owners' Loan Corporation (HOLC) Redlining",
            frame = TRUE) + 
   tm_compass() +
   tm_scalebar() 
 ```
+
 ### 2. Create a table summarizing census block groups that fall within each HOLC grade 
 
-Combine the redlining data and la_ejscreen data
+#### Combine the redlining data and la_ejscreen data
+
+Create a table that shows the percentage of census blocks that fall within each HOLC grade. The number of census blocks that do not have HOLC grades is also calculated in the table. 
+
+Note on data limitations: The la_ejscreen data does not have a column for cities, therefore the la_ejscreen data contains data from all of Los Angeles County. Los Angeles County contains 88 cities according to the official Los Angeles County government webpage. To maintain an approximation of Los Angeles proper st_intersects was employed for this join. 
 ```{r}
-# Joining redlining and la_ejscreen using the geographic data
+# Join redlining and la_ejscreen using the geographic data
 ej_redlining <- st_join(la_ejscreen, redlining, join = st_intersects)
 
-# Drop the geogrphic data since we are only creating a table
+# Drop the geographic data since a table does not require geo-spatial data
 ej_redlining <- st_drop_geometry(ej_redlining)
 ```
 
 ```{r}
-# Clean the names of the new dataframe
+# Change variable names to lower_snake
 ej_redlining <- janitor::clean_names(ej_redlining)
 ```
-
-
+##### Workflow for calculating percentage of census blocks in each HOLC grade 
+Group data by HOLC grade and summarize the number of census blocks in each HOLC grade. Ungroup to ensure that the percentages are calculated based on all census blocks. Calculate percentages and round to 3 decimals. Use kableExtra to create an aesthetic table.
 ```{r}
 # Calculate percentage of census block groups that fall within each HOLC grade
 perc_cen_block <- ej_redlining |> 
   group_by(grade) |> 
   summarise(grade_cnt = n()) |> 
+  ungroup() |> 
   mutate(grade_freq = round((grade_cnt/sum(grade_cnt)* 100), 3))
 
-kable(perc_cen_block, 
-      col.names = c("Grade", "Count", "Percent"),
-      format = "simple",
-      padding = 3)
+# Use kableExtra to create an aesthetic table for 
+perc_cen_block |> 
+  kable(format = "html", # Necessary to add header
+        col.names = c("Grade", "Count", "Percent"),
+        padding = 3) |> 
+  add_header_above(c("Los Angeles Census Block HOLC Grade Percentages"= 3))
 ```
+#### Table Analysis
+As expected the largest percentage of census blocks do not have a historic HOLC score. This is due to the rapid expansion of Los Angeles in the past century. The second highest percentage of census blocks HOLC scores is C, followed by D and B. The lowest percentage of census blocks have a historic HOLC score of A. 
+
 ### 3. Create two visualizations summarizing current conditions (from the EJScreen data) within HOLC grades using the mean of percentile low life expectancy and percentile for Particulate Matter 2.5 variables.
 
 #### Graph average percentile low life expectancy per HOLC grade area
+Group data by HOLC grade and summarize the mean low life expectancy percentile in each HOLC grade. Graph the mean low life expectancy percentile for each grade.
 ```{r}
-ej_redlining |> 
+# Calculate mean of percent of percentile for low life expectancy in HOLC Grades 
+lifeexppct_plot <- ej_redlining |> 
   drop_na() |> 
   group_by(grade) |> 
-  summarise(mean_perce_low_lifeexppct = mean(lifeexppct, na.rm = TRUE)) |> 
+  summarise(mean_perce_low_lifeexppct = mean(p_lifeexppct, na.rm = TRUE)) |> 
   ungroup() |> 
   ggplot(aes(x = grade, y = mean_perce_low_lifeexppct)) +
-  geom_col(aes(fill = grade)) + # geom_col allows for both an x and y for aesthetics
-  labs(title = "Average Percent of Low Life Expectancy in HOLC Grade Areas",
+  geom_col(aes(fill = grade)) + # geom_col allows for both an x and y
+  labs(title = "Low Life Expectancy Average Percentile",
        x = "HOLC Grade",
-       y = "Average Percent of Low Life Expectancy") +
-  scale_fill_manual(values = c("#9ca260", "#98aeac", "#d7b65d", "#cb6e7e")) + # Match colors to historic maps
-  theme_minimal()
+       y = "Average Percentile of Low Life Expectancy") +
+  scale_fill_manual(values = c("#9ca260", 
+                               "#98aeac", 
+                               "#d7b65d", 
+                               "#cb6e7e")) + # Match colors to historic maps
+  theme_minimal() +
+  theme(plot.title = element_text(size=12)) # Adjust title size
 ```
 
 
 #### Graph average percent particulate matter 2.5 per HOLC grade area
+Group data by HOLC grade and summarize the mean Particulate Matter 2.5 (PM 2.5) percentile in each HOLC grade. Graph the mean PM2.5 Percentile for each grade.
 ```{r}
-# Calculate mean of percent of Particulate Matter 2.5 (PM 2.5) in HOLC Grade Areas
-ej_redlining |> 
+# Calculate mean of percentile of Particulate Matter 2.5 (PM 2.5) in HOLC Grade Areas
+p_pm25_plot <- ej_redlining |> 
   drop_na() |>
   group_by(grade) |> # Group by grade 
  summarise(mean_perce_pm25 = mean(p_pm25, na.rm = TRUE)) |>  # Calculate mean pm2.5
   ungroup() |> 
 ggplot(aes(x = grade, y = mean_perce_pm25)) +
   geom_col(aes(fill = grade)) + # geom_col allows for both an x and y for aesthetics
-  labs(title = "Average Percentile for Particulate Matter 2.5 (PM 2.5) in HOLC Grade Areas",
+  labs(title = "PM 2.5 Average Percentile",
        x = "HOLC Grade",
        y = "Average Percentile for PM 2.5") +
-  scale_fill_manual(values = c("#9ca260", "#98aeac", "#d7b65d", "#cb6e7e")) + # Match colors to historic maps
-  theme_minimal()
+  scale_fill_manual(values = c("#9ca260", 
+                               "#98aeac", 
+                               "#d7b65d", 
+                               "#cb6e7e")) + # Match colors to historic maps
+  theme_minimal() +
+  theme(plot.title = element_text(size=12)) # Adjust title size
+```
+
+##### Patchwork
+Use patchwork to create one visualization for percentile low life expectancy and percentile high Particulate Matter 2.5. Set spacers and use layout options to create an aesthetic final graph.
+```{r}
+# Create on plot with patchwork 
+holc_grade_con <- lifeexppct_plot + 
+  plot_spacer() + # Add space between plots
+  p_pm25_plot + 
+  plot_layout(guides = "collect", # Add only one legend
+              widths = c(4,-1,4)) # Dimensions for spacer
+
+# View combined visual
+print(holc_grade_con) 
+
+# Save for furture use
+ggsave("holc_grade_cond.png", holc_grade_con)
 ```
 
 #### Graph Analysis
 
-Both the average percent of low life expectancy and average percentile of Particulate Matter 2.5 per HOLC grade area show that those areas historically less likely to acquire loans from HOLC have present day adverse effects. Percent of low life expectancy clearly increases the worse the grade they were given by the HOLC. In other words, in those areas where HOLC blocked communities from acquiring mortgages, today they are areas associated with mean higher rates of percent low life expectancy and higher rates of average high Particulate Matter 2.5.
+Both the average percent of low life expectancy and average percentile of Particulate Matter 2.5 (PM2.5) per HOLC grade area show that those areas historically less likely to acquire loans from HOLC have present day adverse effects. Low life expectancy average percentages and PM2.5 Average Percentiles clearly increases the worse the grade they were given by the HOLC. In other words, in those areas where HOLC blocked communities from acquiring mortgages in the 1930's, today are areas associated with mean higher rates of low life expectancy average percentages and higher rates of average high PM 2.5 percentiles. This clear visual gives weight to show that historical injustices continue to manifest in adverse affects for those living in marginalized communities. 
 
 # Part 2: Legacy of redlining in biodiversity observations
 ### Create a visualization of the percent of observations within redlined neighborhoods within each HOLC grade
 
 Combine the redlining data and bird observation data
 ```{r}
-# Joining redlining and  using the geographic data
+# Join redlining using the geographic data
 bio_redlining <- st_join(bio_div, redlining, join = st_within)
 
-# Drop the geogrphic data since we are only making a graph
+# Drop the geographic data since graphs do not require it
 bio_redlining <- st_drop_geometry(bio_redlining)
 ```
-
+##### Workflow for calculating percentage of bird sightings in each HOLC grade 
+Group data by HOLC grade and summarize the number of observations in each HOLC grade. Ungroup to ensure that the percentages are calculated based on all census blocks. Calculate percentages by dividing the individual count by the total sum of observations. 
 ```{r}
 # Calculate the number of observations in each grade 
 bio_redlining |> 
@@ -202,12 +258,23 @@ bio_redlining |>
   labs(title = "Percent of Bird Observations per HOLC Grade",
        x = "HOLC Grade",
        y = "Percent of Bird Observations") +
-  scale_fill_manual(values = c("#9ca260", "#98aeac", "#d7b65d", "#cb6e7e")) + # Match colors to historic maps
+  scale_fill_manual(values = c("#9ca260", 
+                               "#98aeac", 
+                               "#d7b65d", 
+                               "#cb6e7e")) + # Match colors to historic maps
   theme_minimal()
 ```
 
-### Reason our findings dont match Ellis-Soto et al. 2023
+### Reason our findings do not match the findings of Ellis-Soto et al. 2023
 Ellis-Soto et al. (2023) uses log to normalize the data. Los Angeles has grown since the HOLC maps were utilized much of present day Los Angeles did not exist. 
 
-# Reference
+# References
 
+- Ellis-Soto, D., Chapman, M., & Locke, D. H. (2023). Historical redlining is associated with increasing geographical disparities in bird biodiversity sampling in the United States. Nature Human Behaviour, 1-9.
+- Gee, G. C. (2008). A multilevel analysis of the relationship between institutional and individual racial discrimination and health status. American journal of public health, 98(Supplement_1), S48-S56.
+- Hoffman, J. S., Shandas, V., & Pendleton, N. (2020). The effects of historical housing policies on resident exposure to intra-urban heat: a study of 108 US urban areas. Climate, 8(1), 12.
+- LA COUNTY CITIES. Accessed October 18, 2025. https://lacounty.gov/newsroom/public-information/la-county-cities/
+-Nardone, A., Rudolph, K. E., Morello-Frosch, R., & Casey, J. A. (2021). Redlines and greenspace: the relationship between historical redlining and 2010 greenspace across the United States. Environmental health perspectives, 129(1), 017006.
+- Robert K. Nelson, LaDale Winling, Richard Marciano, Nathan Connolly, et al., “Mapping Inequality,” American Panorama, ed. Robert K. Nelson and Edward L. Ayers, accessed October 17, 2023, https://dsl.richmond.edu/panorama/redlining/
+- United States Environmental Protection Agency. 2015. EJSCREEN. Retrieved: October 13, 2025, from  [www.epa.gov/ejscreen](www.epa.gov/ejscreen)
+-[U.S. Environmental Protection Agency (EPA), 2023. EJScreen Technical Documentation.](https://drive.google.com/file/d/1nG6Nj1bXfzQFOVMO8Km3eNy4SWu1YcIQ/view)
