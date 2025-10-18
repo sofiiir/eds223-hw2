@@ -7,7 +7,7 @@ message: false
 warning: false
 ---
 # Introduction
-As a racially diverse area of the United States, Los Angeles acts as a case study for the far reaching environmental injustices that occur nationwide. In the 1930's the Home Owner's Loan Corporation (HOLC) gave neighborhoods grades from A to D defining what portions of the city they perceived as worthy of real estate investments. The consequence is that even today effects from this racially motivated grading system manifest in the form of unequal risk to being exposed to environmental hazards. This project explores contemporary symptoms of what has come to be known as redlining. 
+As a racially diverse area of the United States, Los Angeles acts as a case study for the far reaching environmental injustices that occur nationwide. In the 1930's the Home Owner's Loan Corporation (HOLC) gave neighborhoods grades from A to D defining what portions of the city they perceived as worthy of real estate investments. Grade A was given to "more desirable" neighborhoods ranging down to grade D, "more undesirable" neighborhoods. These grades were given based on racial prejudices. The consequence is that even today effects from this grading system manifest in the form of unequal risk to being exposed to environmental hazards. This project explores contemporary symptoms of what has come to be known as redlining. 
 
 **Note on data limitations:** The Environmental Justice data does not have a column for cities, therefore the Environmental Justice data contains data from all of Los Angeles County even after filtering. Los Angeles County contains 88 cities according to the official Los Angeles County government webpage. Explanations are provided in the workflow as to how this data limitation is addressed throughout.
 
@@ -266,7 +266,9 @@ bio_redlining |>
 ```
 
 ### Reason our findings do not match the findings of Ellis-Soto et al. 2023
-Ellis-Soto et al. (2023) uses log to normalize the data. Los Angeles has grown since the HOLC maps were utilized much of present day Los Angeles did not exist. 
+Ellis-Soto et al. (2023) find that those areas rated more favorably on the HOLC grading scale have more citizen bird observations. The finding that those areas with higher HOLC scores have more bird observations is not supported by the analysis in this project. The HOLC grade with the most bird observations according to the graphic above is HOLC grade C. 
+
+Ellis-Soto et al. (2023) states that that "to calculate how the number of bird observations differed across HOLC grades, we calculated the sampling density of bird records by accounting for the area of each HOLC grade per city in km2." The discrepancy in the findings from this analysis are attributed to no adjustment being made for the greater number of HOLC areas being graded as HOLC C. The Ellis-Soto et al. (2023) is a better representation of the data as their account of unevenly distributed HOLC grades interprets the data based on the size discrepancies. 
 
 # References
 
