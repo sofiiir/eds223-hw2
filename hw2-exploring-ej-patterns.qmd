@@ -1,7 +1,7 @@
 ---
 title: "HW2: Exploring Patterns of Environmental Justice"
 author: "Sofia Rodas"
-date: October 13, 2025
+date: October 18, 2025
 format: html
 message: false
 warning: false
@@ -17,8 +17,8 @@ library(tidyverse)
 library(sf) # For handling vector data
 library(tmap) # For making maps
 library(spData) # Pre-loaded spatial data
-library(kableExtra)
-library(patchwork)
+library(kableExtra) # For making tables
+library(patchwork) # For combining graphs
 ```
 
 #### Read in data
@@ -104,7 +104,7 @@ if (st_crs(la_ejscreen)==st_crs(bio_div)){
 When considering how to construct a map of Los Angeles' redlined neighborhoods, the growth of Los Angeles in the last century indicates that not all of present day Los Angeles would have a HOLC grade. Therefore, a base-layer is added to make the map useful in analyzing what sections of Los Angeles have differing HOLC grades. 
 
 ```{r}
-tm_shape(redlining) +
+la_holc <- tm_shape(redlining) +
   tm_basemap() +
   tm_polygons() +
   tm_fill(fill = "grade",
@@ -123,6 +123,15 @@ tm_shape(redlining) +
            frame = TRUE) + 
   tm_compass() +
   tm_scalebar() 
+
+# Display map
+print(la_holc)
+
+# Save map and define the size
+tmap_save(la_holc, 
+          here::here("figs", "la_holc.png"), 
+          height = 8, 
+          width = 14)
 ```
 
 ### 2. Create a table summarizing census block groups that fall within each HOLC grade 
@@ -224,8 +233,8 @@ holc_grade_con <- lifeexppct_plot +
 # View combined visual
 print(holc_grade_con) 
 
-# Save for furture use
-ggsave("holc_grade_cond.png", holc_grade_con)
+# Save for future use
+ggsave(here::here("figs", "holc_grade_cond.png"), holc_grade_con)
 ```
 
 #### Graph Analysis
@@ -247,7 +256,7 @@ bio_redlining <- st_drop_geometry(bio_redlining)
 Group data by HOLC grade and summarize the number of observations in each HOLC grade. Ungroup to ensure that the percentages are calculated based on all census blocks. Calculate percentages by dividing the individual count by the total sum of observations. 
 ```{r}
 # Calculate the number of observations in each grade 
-bio_redlining |> 
+birds_holc <- bio_redlining |> 
   drop_na() |>
   group_by(grade) |> 
   summarise(observation_cnt = n()) |>
@@ -263,20 +272,26 @@ bio_redlining |>
                                "#d7b65d", 
                                "#cb6e7e")) + # Match colors to historic maps
   theme_minimal()
+
+# Display graph
+print(birds_holc)
+
+# Save for future use
+ggsave(here::here("figs", "birds_holc.png"), birds_holc)
 ```
 
 ### Reason our findings do not match the findings of Ellis-Soto et al. 2023
 Ellis-Soto et al. (2023) find that those areas rated more favorably on the HOLC grading scale have more citizen bird observations. The finding that those areas with higher HOLC scores have more bird observations is not supported by the analysis in this project. The HOLC grade with the most bird observations according to the graphic above is HOLC grade C. 
 
-Ellis-Soto et al. (2023) states that that "to calculate how the number of bird observations differed across HOLC grades, we calculated the sampling density of bird records by accounting for the area of each HOLC grade per city in km2." The discrepancy in the findings from this analysis are attributed to no adjustment being made for the greater number of HOLC areas being graded as HOLC C. The Ellis-Soto et al. (2023) is a better representation of the data as their account of unevenly distributed HOLC grades interprets the data based on the size discrepancies. 
+Ellis-Soto et al. (2023) states that that "to calculate how the number of bird observations differed across HOLC grades, we calculated the sampling density of bird records by accounting for the area of each HOLC grade per city in km2." The discrepancy in the findings from this analysis are attributed to no adjustment being made for the greater number of HOLC areas being graded as HOLC C, as shown in the table above. The Ellis-Soto et al. (2023) is a better representation of the data as their account of unevenly distributed HOLC grades interprets the data based on the size discrepancies. 
 
 # References
 
-- Ellis-Soto, D., Chapman, M., & Locke, D. H. (2023). Historical redlining is associated with increasing geographical disparities in bird biodiversity sampling in the United States. Nature Human Behaviour, 1-9.
-- Gee, G. C. (2008). A multilevel analysis of the relationship between institutional and individual racial discrimination and health status. American journal of public health, 98(Supplement_1), S48-S56.
+- Ellis-Soto, D., Chapman, M., & Locke, D. H. (2023). Historical redlining is associated with increasing geographical disparities in bird biodiversity sampling in the United States. Nature Human Behaviour, 1-9. [URL](https://ecoevorxiv.org/repository/view/3736/)
+- - Gee, G. C. (2008). A multilevel analysis of the relationship between institutional and individual racial discrimination and health status. American journal of public health, 98(Supplement_1), S48-S56.
 - Hoffman, J. S., Shandas, V., & Pendleton, N. (2020). The effects of historical housing policies on resident exposure to intra-urban heat: a study of 108 US urban areas. Climate, 8(1), 12.
-- LA COUNTY CITIES. Accessed October 18, 2025. https://lacounty.gov/newsroom/public-information/la-county-cities/
--Nardone, A., Rudolph, K. E., Morello-Frosch, R., & Casey, J. A. (2021). Redlines and greenspace: the relationship between historical redlining and 2010 greenspace across the United States. Environmental health perspectives, 129(1), 017006.
+- LA COUNTY CITIES. Accessed October 18, 2025. [https://lacounty.gov/newsroom/public-information/la-county-cities/](https://lacounty.gov/newsroom/public-information/la-county-cities/)
+- Nardone, A., Rudolph, K. E., Morello-Frosch, R., & Casey, J. A. (2021). Redlines and greenspace: the relationship between historical redlining and 2010 greenspace across the United States. Environmental health perspectives, 129(1), 017006.
 - Robert K. Nelson, LaDale Winling, Richard Marciano, Nathan Connolly, et al., “Mapping Inequality,” American Panorama, ed. Robert K. Nelson and Edward L. Ayers, accessed October 17, 2023, https://dsl.richmond.edu/panorama/redlining/
 - United States Environmental Protection Agency. 2015. EJSCREEN. Retrieved: October 13, 2025, from  [www.epa.gov/ejscreen](www.epa.gov/ejscreen)
 -[U.S. Environmental Protection Agency (EPA), 2023. EJScreen Technical Documentation.](https://drive.google.com/file/d/1nG6Nj1bXfzQFOVMO8Km3eNy4SWu1YcIQ/view)
