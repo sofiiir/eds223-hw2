@@ -5,7 +5,7 @@ This repository explores enviornmental justice issues by exploring historic redl
 
 ## Repository Contents:
 -**Quarto document:** [Redlining exploration quarto](https://github.com/sofiiir/eds223-hw2/blob/main/hw2-exploring-ej-patterns.qmd)
-
+-**Figures:** [Maps and barplots](https://github.com/sofiiir/eds223-hw2/tree/main/figs)
 
 ### References:
 
