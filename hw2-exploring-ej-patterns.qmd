@@ -103,26 +103,47 @@ if (st_crs(la_ejscreen)==st_crs(bio_div)){
 
 When considering how to construct a map of Los Angeles' redlined neighborhoods, the growth of Los Angeles in the last century indicates that not all of present-day Los Angeles would have a HOLC grade. Therefore, a base layer is added to make the map useful in analyzing what sections of Los Angeles have differing HOLC grades. 
 
+Note: The basemap is displaying Environmental Justice data which includes all of Los Angeles County, San Bernardino County, and Orange County. Part of the ocean is included in the official County jurisdictions. 
+
 ```{r}
-la_holc <- tm_shape(redlining) +
-  tm_basemap() +
-  tm_polygons() +
-  tm_fill(fill = "grade",
-          fill.scale = tm_scale_discrete(values = c("#9ca260", 
-                                                    "#98aeac",
-                                                    "#d7b65d",
-                                                    "#cb6e7e")), # Use historic colors
-          fill.legend = tm_legend(title = "HOLC Ranked Redlining",
-                                  labels = c("A", 
-                                             "B", 
-                                             "C", 
-                                             "D", 
-                                             "NA"))) +
-  tm_borders() + # Add borders on top of fill
+# Make a filtered df to use as a basemap
+ socal_ejscreen <- ejscreen |> 
+  filter(CNTY_NAME == "Los Angeles County" |
+           CNTY_NAME == "San Bernardino County" |
+           CNTY_NAME == "Orange County")
+```
+
+#### Making sure the CRS are the same for the datasets
+```{r}
+# Set the CRS to equal each other in a boolean to make sure they are all the same
+# Check relining data is using the same CRS as la_ejscreen data
+if (st_crs(socal_ejscreen)==st_crs(redlining)){
+  print("it's a match!")
+}else {
+    print("still not a match")
+}
+```
+##### Create Map showing HOLC Areas in Los Angeles
+```{r}
+la_holc <- tm_shape(socal_ejscreen) + # Set a baselayer to show the entirety of SoCal
+  tm_polygons(lwd = 0.08) + # Set borders to a lower density
+tm_shape(redlining, is.main = TRUE) + # is.main to make this the size of the map
+  tm_polygons(fill = "grade",
+              fill.scale = tm_scale_discrete(values = c("#9ca260", 
+                                                        "#98aeac", 
+                                                        "#d7b65d", 
+                                                        "#cb6e7e")), # Colors of historic maps
+              fill.legend = tm_legend(title = "Ranked Redlining by the HOLC",
+                                      labels = c("A", 
+                                                 "B", 
+                                                 "C", 
+                                                 "D", 
+                                                 "NA"))) + # Add the label
   tm_title(text = "Los Angeles Historic Home Owners' Loan Corporation (HOLC) Redlining",
            frame = TRUE) + 
   tm_compass() +
-  tm_scalebar() 
+  tm_scalebar() +
+  tm_layout(bg.color = "#2274A5")
 
 # Display map
 print(la_holc)
