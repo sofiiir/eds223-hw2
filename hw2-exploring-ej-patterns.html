@@ -117,8 +117,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
-<p>As a racially diverse area of the United States, Los Angeles acts as a case study for the far reaching environmental injustices that occur nationwide. In the 1930’s the Home Owner’s Loan Corporation (HOLC) gave neighborhoods grades from A to D defining what portions of the city they perceived as worthy of real estate investments. Grade A was given to “more desirable” neighborhoods ranging down to grade D, “more undesirable” neighborhoods. These grades were given based on racial prejudices. The consequence is that even today effects from this grading system manifest in the form of unequal risk to being exposed to environmental hazards. This project explores contemporary symptoms of what has come to be known as redlining.</p>
-<p><strong>Note on data limitations:</strong> The Environmental Justice data does not have a column for cities, therefore the Environmental Justice data contains data from all of Los Angeles County even after filtering. Los Angeles County contains 88 cities according to the official Los Angeles County government webpage. Explanations are provided in the workflow as to how this data limitation is addressed throughout.</p>
+<p>As a racially diverse area of the United States, Los Angeles acts as a case study for the far-reaching environmental injustices that occur nationwide. In the 1930s the Home Owner’s Loan Corporation (HOLC) gave neighborhoods grades from A to D defining what portions of the city they perceived as worthy of real estate investments. Grade A was given to “more desirable” neighborhoods ranging down to grade D, “more undesirable” neighborhoods. These grades were given based on racial prejudices. The consequence is that even today effects from this grading system manifest in the form of unequal risk of exposure to environmental hazards. This project explores contemporary symptoms of what has come to be known as redlining.</p>
+<p><strong>Note on data limitations:</strong> The Environmental Justice data does not have a column for cities; therefore the Environmental Justice data contains data from all of Los Angeles County, even after filtering. Los Angeles County contains 88 cities, according to the official Los Angeles County government webpage. Explanations are provided in the workflow as to how this data limitation is addressed throughout.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load needed libraries </span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
@@ -162,7 +162,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Biodiversity CRS</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(bio_div)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>The CRS differ between the datasets, so further analysis is needed to decide what is the best coordinate reference system for this project.</p>
+<p>The CRS differs between the datasets, so further analysis is needed to decide what is the best coordinate reference system for this project.</p>
 <p>Note: The CRS outputs are hidden for a cleaner document.</p>
 </section>
 <section id="check-to-see-if-the-projections-are-geographic-or-projected." class="level3">
@@ -181,7 +181,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>[1] TRUE</code></pre>
 </div>
 </div>
-<p>Since the Environmental Justice data is projected, and projected coordinate reference systems are better for 2D map making, the crs from the Environmental Justice data, WGS: Pseudo-Mercator, will be used for this mapping assignment.</p>
+<p>Since the Environmental Justice data is projected, and projected coordinate reference systems are better for 2D map making, the CRS from the Environmental Justice data, WGS: Pseudo-Mercator, will be used for this mapping assignment.</p>
 <section id="change-the-crs-of-redlining-data-and-biodiversity-data-to-match-the-crs-of-the-environmental-justice-data." class="level4">
 <h4 class="anchored" data-anchor-id="change-the-crs-of-redlining-data-and-biodiversity-data-to-match-the-crs-of-the-environmental-justice-data.">Change the CRS of redlining data and biodiversity data to match the CRS of the Environmental Justice data.</h4>
 <div class="cell">
@@ -220,7 +220,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Part 1: Legacy of Redlining in current environmental (in)justice</h1>
 <section id="create-a-map-of-historical-relining-neighborhoods" class="level3">
 <h3 class="anchored" data-anchor-id="create-a-map-of-historical-relining-neighborhoods">1. Create a map of historical relining neighborhoods</h3>
-<p>When considering how to construct a map of Los Angeles’ redlined neighborhoods, the growth of Los Angeles in the last century indicates that not all of present day Los Angeles would have a HOLC grade. Therefore, a base-layer is added to make the map useful in analyzing what sections of Los Angeles have differing HOLC grades.</p>
+<p>When considering how to construct a map of Los Angeles’ redlined neighborhoods, the growth of Los Angeles in the last century indicates that not all of present-day Los Angeles would have a HOLC grade. Therefore, a base layer is added to make the map useful in analyzing what sections of Los Angeles have differing HOLC grades.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>la_holc <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(redlining) <span class="sc">+</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_basemap</span>() <span class="sc">+</span></span>
@@ -345,7 +345,7 @@ Los Angeles Census Block HOLC Grade Percentages
 </section>
 <section id="table-analysis" class="level4">
 <h4 class="anchored" data-anchor-id="table-analysis">Table Analysis</h4>
-<p>As expected the largest percentage of census blocks do not have a historic HOLC score. This is due to the rapid expansion of Los Angeles in the past century. The second highest percentage of census blocks HOLC scores is C, followed by D and B. The lowest percentage of census blocks have a historic HOLC score of A.</p>
+<p>As expected, the largest percentage of census blocks do not have a historic HOLC score. This is due to the rapid expansion of Los Angeles in the past century. The second highest percentage of census blocks HOLC scores is C, followed by D and B. The lowest percentage of census blocks has a historic HOLC score of A.</p>
 </section>
 </section>
 <section id="create-two-visualizations-summarizing-current-conditions-from-the-ejscreen-data-within-holc-grades-using-the-mean-of-percentile-low-life-expectancy-and-percentile-for-particulate-matter-2.5-variables." class="level3">
@@ -397,7 +397,7 @@ Los Angeles Census Block HOLC Grade Percentages
 </div>
 <section id="patchwork" class="level5">
 <h5 class="anchored" data-anchor-id="patchwork">Patchwork</h5>
-<p>Use patchwork to create one visualization for percentile low life expectancy and percentile high Particulate Matter 2.5. Set spacers and use layout options to create an aesthetic final graph.</p>
+<p>Use patchwork to create one visualization for the percentile low life expectancy and the percentile high Particulate Matter 2.5. Set spacers and use layout options to create an aesthetic final graph.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create on plot with patchwork </span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>holc_grade_con <span class="ot">&lt;-</span> lifeexppct_plot <span class="sc">+</span> </span>
@@ -422,7 +422,7 @@ Los Angeles Census Block HOLC Grade Percentages
 </section>
 <section id="graph-analysis" class="level4">
 <h4 class="anchored" data-anchor-id="graph-analysis">Graph Analysis</h4>
-<p>Both the average percent of low life expectancy and average percentile of Particulate Matter 2.5 (PM2.5) per HOLC grade area show that those areas historically less likely to acquire loans from HOLC have present day adverse effects. Low life expectancy average percentages and PM2.5 Average Percentiles clearly increases the worse the grade they were given by the HOLC. In other words, in those areas where HOLC blocked communities from acquiring mortgages in the 1930’s, today are areas associated with mean higher rates of low life expectancy average percentages and higher rates of average high PM 2.5 percentiles. This clear visual gives weight to show that historical injustices continue to manifest in adverse affects for those living in marginalized communities.</p>
+<p>Both the average percent of low life expectancy and the average percentile of Particulate Matter 2.5 (PM2.5) per HOLC grade area show that those areas historically less likely to acquire loans from HOLC have present-day adverse effects. Low life expectancy average percentages and PM2.5 Average Percentiles clearly increase the worse the grade they were given by the HOLC. In other words, in those areas where HOLC blocked communities from acquiring mortgages in the 1930s, today, are areas associated with mean higher rates of low life expectancy average percentages and higher rates of average high PM 2.5 percentiles. This clear visual gives weight to show that historical injustices continue to manifest in adverse effects for those living in marginalized communities.</p>
 </section>
 </section>
 </section>
@@ -477,16 +477,14 @@ Los Angeles Census Block HOLC Grade Percentages
 <section id="reason-our-findings-do-not-match-the-findings-of-ellis-soto-et-al.-2023" class="level3">
 <h3 class="anchored" data-anchor-id="reason-our-findings-do-not-match-the-findings-of-ellis-soto-et-al.-2023">Reason our findings do not match the findings of Ellis-Soto et al.&nbsp;2023</h3>
 <p>Ellis-Soto et al.&nbsp;(2023) find that those areas rated more favorably on the HOLC grading scale have more citizen bird observations. The finding that those areas with higher HOLC scores have more bird observations is not supported by the analysis in this project. The HOLC grade with the most bird observations according to the graphic above is HOLC grade C.</p>
-<p>Ellis-Soto et al.&nbsp;(2023) states that that “to calculate how the number of bird observations differed across HOLC grades, we calculated the sampling density of bird records by accounting for the area of each HOLC grade per city in km2.” The discrepancy in the findings from this analysis are attributed to no adjustment being made for the greater number of HOLC areas being graded as HOLC C, as shown in the table above. The Ellis-Soto et al.&nbsp;(2023) is a better representation of the data as their account of unevenly distributed HOLC grades interprets the data based on the size discrepancies.</p>
+<p>Ellis-Soto et al.&nbsp;(2023) state that “to calculate how the number of bird observations differed across HOLC grades, we calculated the sampling density of bird records by accounting for the area of each HOLC grade per city in km2.” The discrepancy in the findings from this analysis is attributed to no adjustment being made for the greater number of HOLC areas being graded as HOLC C, as shown in the table above. The Ellis-Soto et al.&nbsp;(2023) is a better representation of the data as their account of unevenly distributed HOLC grades interprets the data based on the size discrepancies.</p>
 </section>
 </section>
 <section id="references" class="level1">
 <h1>References</h1>
 <ul>
 <li>Ellis-Soto, D., Chapman, M., &amp; Locke, D. H. (2023). Historical redlining is associated with increasing geographical disparities in bird biodiversity sampling in the United States. Nature Human Behaviour, 1-9. <a href="https://ecoevorxiv.org/repository/view/3736/">URL</a></li>
-<li><ul>
 <li>Gee, G. C. (2008). A multilevel analysis of the relationship between institutional and individual racial discrimination and health status. American journal of public health, 98(Supplement_1), S48-S56.</li>
-</ul></li>
 <li>Hoffman, J. S., Shandas, V., &amp; Pendleton, N. (2020). The effects of historical housing policies on resident exposure to intra-urban heat: a study of 108 US urban areas. Climate, 8(1), 12.</li>
 <li>LA COUNTY CITIES. Accessed October 18, 2025. <a href="https://lacounty.gov/newsroom/public-information/la-county-cities/">https://lacounty.gov/newsroom/public-information/la-county-cities/</a></li>
 <li>Nardone, A., Rudolph, K. E., Morello-Frosch, R., &amp; Casey, J. A. (2021). Redlines and greenspace: the relationship between historical redlining and 2010 greenspace across the United States. Environmental health perspectives, 129(1), 017006.</li>
