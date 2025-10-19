@@ -3,8 +3,14 @@
 
 This repository explores enviornmental justice issues by exploring historic redlining in Los Angeles and how these neighborhoods are still experiencing an unequal burden in negative environmental environments including increased  exposure to environmental toxins and less access to nature. As a racially diverse area of the United States, Los Angeles acts as a case study for the far reaching environmental injustices that occur nationwide. In the 1930's the Home Owner's Loan Corporation (HOLC) gave neighborhoods grades from A to D defining what portions of the city they perceived as worthy of real estate investments. Grade A was given to "more desirable" neighborhoods ranging down to grade D, "more undesirable" neighborhoods. These grades were given based on racial prejudices.  This project explores contemporary symptoms of what has come to be known as redlining. 
 
+## File structure:
+<img width="824" height="390" alt="image" src="https://github.com/user-attachments/assets/8be91575-eb01-4245-9a72-cd3c5cf820d6" />
+
+**Note:** Data was added to .gitignore. Data can be downloaded from a [Google Drive](https://drive.google.com/file/d/14CauXFZkVh_6z2Euq0m1Sq1kHQ31fiMk/view)
+
 ## Repository Contents:
 -**Quarto document:** [Redlining exploration quarto](https://github.com/sofiiir/eds223-hw2/blob/main/hw2-exploring-ej-patterns.qmd)
+
 -**Figures:** [Maps and barplots](https://github.com/sofiiir/eds223-hw2/tree/main/figs)
 
 ### References:
