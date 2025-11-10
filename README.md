@@ -1,4 +1,4 @@
-# EDS223-HW2 Exploring Patterns in Los Angeles Redlining Data 
+# EDS223: Exploring Patterns in Los Angeles Redlining Data 
 #### Author : Sofia Rodas
 
 This repository explores enviornmental justice issues by exploring historic redlining in Los Angeles and how these neighborhoods are still experiencing an unequal burden in negative environmental environments including increased  exposure to environmental toxins and less access to nature. As a racially diverse area of the United States, Los Angeles acts as a case study for the far reaching environmental injustices that occur nationwide. In the 1930's the Home Owner's Loan Corporation (HOLC) gave neighborhoods grades from A to D defining what portions of the city they perceived as worthy of real estate investments. Grade A was given to "more desirable" neighborhoods ranging down to grade D, "more undesirable" neighborhoods. These grades were given based on racial prejudices.  This project explores contemporary symptoms of what has come to be known as redlining. 
