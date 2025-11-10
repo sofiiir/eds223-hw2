@@ -87,14 +87,14 @@ bio_div <- st_transform(bio_div, crs = st_crs(la_ejscreen))
 if (st_crs(la_ejscreen)==st_crs(redlining)){
   print("it's a match!")
 }else {
-    print("still not a match")
+    warning("still not a match")
 }
 
 # Check bio diversity data is using the same CRS as la_ejscreen data
 if (st_crs(la_ejscreen)==st_crs(bio_div)){
   print("it's a match!")
 }else {
-    print("still not a match")
+    warning("still not a match")
   }
 ```
 
@@ -120,7 +120,7 @@ Note: The basemap is displaying Environmental Justice data which includes all of
 if (st_crs(socal_ejscreen)==st_crs(redlining)){
   print("it's a match!")
 }else {
-    print("still not a match")
+    warning("still not a match")
 }
 ```
 ##### Create Map showing HOLC Areas in Los Angeles
