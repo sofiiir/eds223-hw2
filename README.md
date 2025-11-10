@@ -5,14 +5,14 @@ This repository explores enviornmental justice issues by exploring historic redl
 
 ## Data Access:
 
--**Data download:** All data used in this analyisis can be accessed and downloaded in a single Google Drive here: [Data Google Drive](https://drive.google.com/file/d/14CauXFZkVh_6z2Euq0m1Sq1kHQ31fiMk/view)
+-**Data download:** All data used in this analyisis can be accessed and downloaded in a single Google Drive here: [Data Google Drive](https://drive.google.com/file/d/14CauXFZkVh_6z2Euq0m1Sq1kHQ31fiMk/view). The data is all publicly available as denoted below. 
 
--**EPA EJ Mapping:** United States Environmental Protection Agency’s former EJScreen: Environmental Justice Screening and Mapping Tool is no longer available. A similar tool can be found which is published by the Public Environmental Data Partners [here](https://pedp-ejscreen.azurewebsites.net/). You can also find the data in the Data Google Drive as `ejscreen/EJSCREEN_2023_BG_StatePct_with_AS_CNMI_GU_VI.gdb`.
+-**EPA EJ Mapping:** Originally, the United States Environmental Protection Agency’s former EJScreen: Environmental Justice Screening and Mapping Tool was publicly available through their webpage. Unfortunately, it is no longer available. A similar tool can be found which is published by the Public Environmental Data Partners [here](https://pedp-ejscreen.azurewebsites.net/). You can also find the data in the Data Google Drive as `ejscreen/EJSCREEN_2023_BG_StatePct_with_AS_CNMI_GU_VI.gdb`.
 
--**HOLC Grades:** Historic Los Angeles Home Owners’ Loan Corporation (HOLC) grading scales, informally known as redlining data is available through Mapping [Inequality
+-**HOLC Grades:** Historic Los Angeles Home Owners’ Loan Corporation (HOLC) grading scales, informally known as redlining data is publicly available through Mapping [Inequality
 Redlining in New Deal America](https://dsl.richmond.edu/panorama/redlining/data). You can also find the data in the Data Google Drive as `mapping-inequality/mapping-inequality-los-angeles.json`.
 
--**Biodiversity observations:** Global Biodiversity Information Facility has been an aggregator of biodiversity around the world. Unfortunately, all of their data links used in to access data for this analysis are unopperational. You can find the data in the Data Google Drive as `gbif-birds-LA.shp`.
+-**Biodiversity observations:** Global Biodiversity Information Facility has been an aggregator of biodiversity around the world and has been historically publicly available. Unfortunately, all of their data links used to access their data for this analysis are unopperational. You can find the data in the Data Google Drive as `gbif-birds-LA.shp`.
 
 ## File structure:
 <img width="824" height="390" alt="image" src="https://github.com/user-attachments/assets/8be91575-eb01-4245-9a72-cd3c5cf820d6" />
