@@ -3,6 +3,17 @@
 
 This repository explores enviornmental justice issues by exploring historic redlining in Los Angeles and how these neighborhoods are still experiencing an unequal burden in negative environmental environments including increased  exposure to environmental toxins and less access to nature. As a racially diverse area of the United States, Los Angeles acts as a case study for the far reaching environmental injustices that occur nationwide. In the 1930's the Home Owner's Loan Corporation (HOLC) gave neighborhoods grades from A to D defining what portions of the city they perceived as worthy of real estate investments. Grade A was given to "more desirable" neighborhoods ranging down to grade D, "more undesirable" neighborhoods. These grades were given based on racial prejudices.  This project explores contemporary symptoms of what has come to be known as redlining. 
 
+## Data Access:
+
+-**Data download:** [Data Google Drive](https://drive.google.com/file/d/14CauXFZkVh_6z2Euq0m1Sq1kHQ31fiMk/view)
+
+-**EPA EJ Mapping:** United States Environmental Protection Agency’s former EJScreen: Environmental Justice Screening and Mapping Tool is no longer available. A similar tool can be found which is published by the Public Environmental Data Partners [here](https://pedp-ejscreen.azurewebsites.net/) You can also find the data in the data google drive as `ejscreen/EJSCREEN_2023_BG_StatePct_with_AS_CNMI_GU_VI.gdb`.
+
+-**HOLC Grades:** Historic Los Angeles Home Owners’ Loan Corporation (HOLC) grading scales, informally known as redlining data is available through Mapping [Inequality
+Redlining in New Deal America](https://dsl.richmond.edu/panorama/redlining/data) You can also find the data in the data google drive as `mapping-inequality/mapping-inequality-los-angeles.json`.
+
+-**Biodiversity observations:** Global Biodiversity Information Facility has been an aggregator of biodiversity around the world. Unfortunately, all of their data link is unopperational. Find the data in the data google drive as `gbif-birds-LA.shp`.
+
 ## File structure:
 <img width="824" height="390" alt="image" src="https://github.com/user-attachments/assets/8be91575-eb01-4245-9a72-cd3c5cf820d6" />
 
