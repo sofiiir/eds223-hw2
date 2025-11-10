@@ -5,7 +5,7 @@ This repository explores enviornmental justice issues by exploring historic redl
 
 ## Data Access:
 
--**Data download:** [Data Google Drive](https://drive.google.com/file/d/14CauXFZkVh_6z2Euq0m1Sq1kHQ31fiMk/view)
+-**Data download:** All data used in this analyisis can be accessed and downloaded in a single Google Drive here: [Data Google Drive](https://drive.google.com/file/d/14CauXFZkVh_6z2Euq0m1Sq1kHQ31fiMk/view)
 
 -**EPA EJ Mapping:** United States Environmental Protection Agency’s former EJScreen: Environmental Justice Screening and Mapping Tool is no longer available. A similar tool can be found which is published by the Public Environmental Data Partners [here](https://pedp-ejscreen.azurewebsites.net/) You can also find the data in the data google drive as `ejscreen/EJSCREEN_2023_BG_StatePct_with_AS_CNMI_GU_VI.gdb`.
 
